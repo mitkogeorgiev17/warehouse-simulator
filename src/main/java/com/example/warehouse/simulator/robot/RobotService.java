@@ -2,6 +2,8 @@ package com.example.warehouse.simulator.robot;
 
 import com.example.warehouse.simulator.robot.model.Robot;
 import com.example.warehouse.simulator.robot.model.request.CreateRobotCommand;
+import com.example.warehouse.simulator.warehouse.WarehouseService;
+
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class RobotService {
     private final RobotRepository repository;
+    private final WarehouseService warehouseService;
 
     public void createRobot(CreateRobotCommand command) {
         log.info("Creating a new robot with serial number: {}", command.getSerialNumber());
@@ -28,6 +31,10 @@ public class RobotService {
                 .setBaseX(command.getBaseX() != null ? command.getBaseX() : 0)
                 .setBaseY(command.getBaseY() != null ? command.getBaseY() : 0);
 
+
+        warehouseService.markRobotBaseOnGrid(newRobot);
+        newRobot.setStatus(Robot.RobotStatus.INACTIVE);
+        log.info("Robot with base coordinates X: {}, Y: {} is being created.", newRobot.getBaseX(), newRobot.getBaseY());
         var savedRobot = repository.save(newRobot);
 
         log.info("Robot {} created successfully.", savedRobot.getSerialNumber());

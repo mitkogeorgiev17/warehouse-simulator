@@ -31,5 +31,6 @@ public class Shelf {
     @JoinColumn(name = "product_id")
     private Product product;
 
+    @Column(name = "quantity")
     private long quantity;
 }
