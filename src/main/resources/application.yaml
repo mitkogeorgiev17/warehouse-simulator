@@ -14,3 +14,5 @@ spring:
 warehouse:
   width: 20
   height: 20
+
+threadWorkers: 10

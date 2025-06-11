@@ -26,7 +26,9 @@ public class RobotService {
         var newRobot = new Robot()
                 .setSerialNumber(command.getSerialNumber())
                 .setBaseX(command.getBaseX() != null ? command.getBaseX() : 0)
-                .setBaseY(command.getBaseY() != null ? command.getBaseY() : 0);
+                .setBaseY(command.getBaseY() != null ? command.getBaseY() : 0)
+                .setLocationX(command.getBaseX() != null ? command.getBaseX() : 0)
+                .setLocationY(command.getBaseY() != null ? command.getBaseY() : 0);
 
         var savedRobot = repository.save(newRobot);
 

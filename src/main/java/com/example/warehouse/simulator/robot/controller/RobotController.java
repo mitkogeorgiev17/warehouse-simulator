@@ -10,7 +10,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
-@RequestMapping("/robots/v1.0.0")
+@RequestMapping("/robots")
 @RequiredArgsConstructor
 public class RobotController implements RobotOperations {
     private final RobotService service;

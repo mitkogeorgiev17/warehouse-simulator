@@ -9,7 +9,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
-@RequestMapping("/shelves/v1.0.0")
+@RequestMapping("/shelves")
 @RequiredArgsConstructor
 public class ShelfController implements ShelfOperations{
     private final ShelfService service;
