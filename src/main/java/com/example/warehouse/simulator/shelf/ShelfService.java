@@ -4,7 +4,9 @@ import com.example.warehouse.simulator.product.ProductRepository;
 import com.example.warehouse.simulator.product.model.Product;
 import com.example.warehouse.simulator.shelf.model.Shelf;
 import com.example.warehouse.simulator.shelf.model.request.CreateShelfCommand;
-import com.example.warehouse.simulator.warehouse.WarehouseService;
+import com.example.warehouse.simulator.warehouse.WarehouseRepository;
+import com.example.warehouse.simulator.warehouse.model.Warehouse;
+import com.example.warehouse.simulator.warehouse.utils.GridUtils;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -20,7 +22,7 @@ import org.springframework.stereotype.Service;
 public class ShelfService {
     private final ShelfRepository repository;
     private final ProductRepository productRepository;
-    private final WarehouseService warehouseService;
+    private final WarehouseRepository warehouseRepository;
 
     public void createShelf(CreateShelfCommand command) {
         String newShelfCoordinates = String.format("X:%d / Y:%d", command.getLocationX(), command.getLocationY());
@@ -39,15 +41,22 @@ public class ShelfService {
         log.info("Shelf created successfully on {}. ID: {}", newShelfCoordinates, savedShelf.getId());
     }
 
+    public Shelf findShelf(@Min(value = 1, message = "Provide shelf ID.") long shelfId) {
+        return repository.findById(shelfId)
+                .orElseThrow(() -> new EntityNotFoundException("Shelf with ID " + shelfId + " not found."));
+    }
+
     private Product findProduct(@Min(value = 1, message = "Provide product ID.") long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new EntityNotFoundException("Product with ID " + productId + " not found."));
     }
 
     private void validateShelfCoordinates(CreateShelfCommand command) {
-        boolean shelfAlreadyExistsOnCoordinates = warehouseService.canPlaceShelfAt(command.getLocationX(), command.getLocationY());
-
-        if (shelfAlreadyExistsOnCoordinates) {
+        Warehouse warehouse = warehouseRepository.findAll().stream().findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("No warehouse found."));
+        boolean cellAvailable = GridUtils.isCellAvailableForPlacement(
+                warehouse.getGrid(), command.getLocationX(), command.getLocationY());
+        if (!cellAvailable) {
             throw new EntityExistsException("Shelf already exists on said coordinates.");
         }
     }

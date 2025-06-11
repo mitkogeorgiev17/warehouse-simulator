@@ -3,14 +3,13 @@ spring:
     name: WarehouseSimulator
   datasource:
     driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: postgres
-    url: jdbc:postgresql://localhost:5432/warranty_tracker
+    username: myuser
+    password: mypassword
+    url: jdbc:postgresql://localhost:5432/postgres
   jpa:
     open-in-view: false
     hibernate:
       ddl-auto: update
-
 warehouse:
   width: 20
   height: 20
