@@ -4,7 +4,7 @@ import com.example.warehouse.simulator.product.ProductRepository;
 import com.example.warehouse.simulator.product.model.Product;
 import com.example.warehouse.simulator.shelf.model.Shelf;
 import com.example.warehouse.simulator.shelf.model.request.CreateShelfCommand;
-import com.example.warehouse.simulator.warehouse.WarehouseService;
+import com.example.warehouse.simulator.warehouse.WarehouseUtils;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 public class ShelfService {
     private final ShelfRepository repository;
     private final ProductRepository productRepository;
-    private final WarehouseService warehouseService;
+    private final WarehouseUtils warehouseUtils;
 
     public void createShelf(CreateShelfCommand command) {
         String newShelfCoordinates = String.format("X:%d / Y:%d", command.getLocationX(), command.getLocationY());
@@ -36,6 +36,8 @@ public class ShelfService {
 
         var savedShelf = repository.save(shelf);
 
+        warehouseUtils.markPosition(savedShelf.getLocationX(), savedShelf.getLocationY(), true);
+
         log.info("Shelf created successfully on {}. ID: {}", newShelfCoordinates, savedShelf.getId());
     }
 
@@ -45,9 +47,9 @@ public class ShelfService {
     }
 
     private void validateShelfCoordinates(CreateShelfCommand command) {
-        boolean shelfAlreadyExistsOnCoordinates = warehouseService.canPlaceShelfAt(command.getLocationX(), command.getLocationY());
+        boolean canPlace = warehouseUtils.canPlaceShelfAt(command.getLocationX(), command.getLocationY());
 
-        if (shelfAlreadyExistsOnCoordinates) {
+        if (!canPlace) {
             throw new EntityExistsException("Shelf already exists on said coordinates.");
         }
     }
@@ -55,11 +57,12 @@ public class ShelfService {
     public void deleteShelf(long shelfId) {
         log.info("Deleting shelf by ID {}.", shelfId);
 
-        if (!repository.existsById(shelfId)) {
-            throw new EntityNotFoundException("Shelf with ID " + shelfId + " not found.");
-        }
+        var shelf = repository.findById(shelfId)
+                        .orElseThrow(() -> new EntityNotFoundException("Shelf with ID " + shelfId + " not found."));
 
-        repository.deleteById(shelfId);
+        repository.delete(shelf);
+
+        warehouseUtils.markPosition(shelf.getLocationX(), shelf.getLocationY(), false);
 
         log.info("Shelf deleted successfully.");
     }

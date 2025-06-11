@@ -29,6 +29,12 @@ public class Robot {
     @Column(name = "base_y")
     private int baseY = 0;
 
+    @Column(name = "location_x")
+    private int locationX = 0;
+
+    @Column(name = "location_y")
+    private int locationY = 0;
+
     @Column(name = "last_updated")
     private LocalDateTime lastUpdated = LocalDateTime.now();
 
@@ -36,4 +42,4 @@ public class Robot {
         ACTIVE,
         INACTIVE
     }
-} 
+}

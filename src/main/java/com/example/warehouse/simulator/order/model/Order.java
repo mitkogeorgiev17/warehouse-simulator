@@ -1,4 +1,4 @@
-package com.example.warehouse.simulator.order;
+package com.example.warehouse.simulator.order.model;
 
 import com.example.warehouse.simulator.product.model.Product;
 import com.example.warehouse.simulator.robot.model.Robot;
@@ -6,16 +6,18 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.util.Map;
 
-import static com.example.warehouse.simulator.order.Order.OrderStatus.PENDING;
+import static com.example.warehouse.simulator.order.model.Order.OrderStatus.PENDING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
+@Accessors(chain = true)
 @Table(name = "orders")
 public class Order {
     @Id
@@ -27,10 +29,6 @@ public class Order {
     @MapKeyJoinColumn(name = "product_id")
     @Column(name = "quantity")
     private Map<Product, Long> items;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "assigned_robot_id")
-    private Robot robot;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status = PENDING;

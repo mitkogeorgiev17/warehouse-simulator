@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import static org.springframework.http.HttpStatus.*;
 
 @RestController
-@RequestMapping("/products/v1.0.0")
+@RequestMapping("/products")
 @RequiredArgsConstructor
 public class ProductController implements ProductOperations {
     private final ProductService service;
